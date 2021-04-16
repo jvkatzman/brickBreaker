@@ -12,7 +12,7 @@ ctx.clearRect(0,0,GAME_WIDTH,GAME_HEIGHT);
 
 let paddle = new Paddle(GAME_WIDTH, GAME_HEIGHT);
 
-new InputHandler();
+new InputHandler(paddle);
 
 paddle.draw(ctx);
 
