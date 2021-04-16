@@ -15,4 +15,11 @@ export  default class Paddle {
 
     }
 
+    update(deltaTime) {
+
+        if (!deltaTime) return;
+        // this.position.x +=5/ deltaTime;
+
+    }
+
 }
