@@ -16,31 +16,30 @@ export default class Game {
     constructor(gameWidth, gameHeight){
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
-
+        this.gamestate=GAMESTATE.MENU;
+        this.ball = new Ball(this);
+        this.paddle = new Paddle(this);
+        this.gameObjects=[];
+        new InputHandler(this.paddle, this);
     }
 
     start(){
-        this.gamestate=GAMESTATE.RUNNING;
-        this.ball = new Ball(this);
-        this.paddle = new Paddle(this);
-        //let brick = new Brick(this, {x:20, y:20});
-
-        //let bricks=[];
+        if (this.gamestate !== GAMESTATE.MENU) return;
+        
         let bricks = buildLevel(this, level1);
-
-
         this.gameObjects = [
             this.ball,
             this.paddle,
             ...bricks
         ];
 
-
-        new InputHandler(this.paddle, this);
+        this.gamestate=GAMESTATE.RUNNING;
+        
     }
 
     update(deltaTime){
-        if (this.gamestate == GAMESTATE.PAUSED) return;
+        if (this.gamestate === GAMESTATE.PAUSED || 
+            this.gamestate === GAMESTATE.MENU) return;
         this.gameObjects.forEach((Object) => Object.update(deltaTime));
         this.gameObjects = this.gameObjects.filter(
             object => !object.markedForDeletion);
@@ -50,7 +49,7 @@ export default class Game {
 
         this.gameObjects.forEach((Object) => Object.draw(ctx));
 
-        if (this.gamestate==GAMESTATE.PAUSED){
+        if (this.gamestate===GAMESTATE.PAUSED){
             // cover whole screen with color
             ctx.rect(0,0,this.gameWidth, this.gameHeight);
             ctx.fillStyle="rgba(0,0,0,0.5)";
@@ -62,7 +61,18 @@ export default class Game {
             ctx.fillText("Paused",this.gameWidth/2, this.gameHeight/2);
         }
 
+        if (this.gamestate===GAMESTATE.MENU){
+            // cover whole screen with color
+            ctx.rect(0,0,this.gameWidth, this.gameHeight);
+            ctx.fillStyle="rgba(0,0,0,1)";
+            ctx.fill();
+
+            ctx.font = "30px Ariel";
+            ctx.fillStyle="white";
+            ctx.textAlign = "center";
+            ctx.fillText("Press space bar to Start",this.gameWidth/2, this.gameHeight/2);
         }
+    }
 
     togglePause(){
         if (this.gamestate == GAMESTATE.PAUSED) {
