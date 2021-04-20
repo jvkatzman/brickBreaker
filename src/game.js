@@ -18,10 +18,6 @@ export default class Game {
 
         //let bricks=[];
         let bricks = buildLevel(this, level1);
-// for (let i = 0; i < 10; i++) {
-//     bricks.push(new Brick(this, {x:i * 52, y:30})) ;
-    
-
 
 
         this.gameObjects = [
@@ -36,6 +32,8 @@ export default class Game {
 
     update(deltaTime){
         this.gameObjects.forEach((Object) => Object.update(deltaTime));
+        this.gameObjects = this.gameObjects.filter(
+            object => !object.markedForDeletion);
     }
 
     draw(ctx){

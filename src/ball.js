@@ -1,3 +1,5 @@
+import {detectCollision} from './collisionDetection.js';
+
 export  default class Ball {
     constructor(game){
         this.image = document.getElementById('img_ball');
@@ -34,22 +36,14 @@ export  default class Ball {
             this.speed.y = -this.speed.y;
         };
 
-        // hitting paddle?
-        let bottomOfBall = this.position.y + this.size;
-        let topOfPaddle = this.game.paddle.position.y;
-        let leftSideOfPaddle = this.game.paddle.position.x;
-        let rightSideOfPaddle = this.game.paddle.position.x + this.game.paddle.width;
-        
-        // hitting top of paddle and able to go to the left/right of paddle?
-        if(bottomOfBall >= topOfPaddle
-            && this.position.x >= leftSideOfPaddle
-            && this.position.x + this.size <= rightSideOfPaddle) 
-            {
-            //reverse speed
-            this.speed.y= - this.speed.y;
+        if (detectCollision(this, this.game.paddle)) {
+            //reverse spee
+            this.speed.y = -this.speed.y;
             // set ball just touching paddle
             this.position.y = this.game.paddle.position.y - this.size;
-        }
+          }
+
+
 
     }
 
