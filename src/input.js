@@ -1,7 +1,8 @@
+import Game from "./game.js";
 import Paddle from "./paddle.js";
 
 export default class InputHandler {
-    constructor(paddle){
+    constructor(paddle, game){
         document.addEventListener('keydown',(event)=>{
             
 
@@ -14,6 +15,9 @@ export default class InputHandler {
                     paddle.moveRight();
                     break;
 
+                case 27:
+                    game.togglePause();
+                    break;
                 default:
                     break;
             }
@@ -33,6 +37,8 @@ export default class InputHandler {
                     if (paddle.speed > 0)
                         paddle.stop();
                     break;
+                
+
 
                 default:
                     break;
