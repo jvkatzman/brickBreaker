@@ -2,13 +2,14 @@ import Paddle from './paddle.js';
 import InputHandler from './input.js';
 import Ball from './ball.js';
 import Brick from './brick.js';
-import {buildLevel, level1} from './levels.js';
+import {buildLevel, level1, level2} from './levels.js';
 
 const GAMESTATE = {
     PAUSED: 0,
     RUNNING: 1,
     MENU: 2,
-    GAMEOVER: 3
+    GAMEOVER: 3,
+    NEWLEVEL:4
 };
 
 
@@ -22,17 +23,22 @@ export default class Game {
         this.gameObjects=[];
         this.bricks = [];
         this.lives = 3;
+
+        this.levels = [level1, level2];
+        this.currentLevel = 0;
+
         new InputHandler(this.paddle, this);
     }
 
     start(){
-        if (this.gamestate !== GAMESTATE.MENU) return;
-
-        let bricks = buildLevel(this, level1);
+        if (this.gamestate !== GAMESTATE.MENU && 
+            this.gamestate !== GAMESTATE.NEWLEVEL) return;
+        
+        this.bricks = buildLevel(this, this.levels[this.currentLevel]);
+        this.ball.reset();
         this.gameObjects = [
             this.ball,
-            this.paddle,
-            ...bricks
+            this.paddle
         ];
 
         this.gamestate=GAMESTATE.RUNNING;
@@ -44,14 +50,25 @@ export default class Game {
         if (this.gamestate === GAMESTATE.PAUSED || 
             this.gamestate === GAMESTATE.MENU ||
             this.gamestate === GAMESTATE.GAMEOVER) return;
-        this.gameObjects.forEach((Object) => Object.update(deltaTime));
-        this.gameObjects = this.gameObjects.filter(
-            object => !object.markedForDeletion);
+
+
+        if(this.bricks.length === 0){
+            this.currentLevel++;
+            this.gamestate=GAMESTATE.NEWLEVEL;
+            this.start();
+        }
+
+        //combine gameObjects and bricks into 1 array
+        [...this.gameObjects, ...this.bricks].forEach((Object) => Object.update(deltaTime));
+
+        // check for bricks to delete
+        this.bricks = this.bricks.filter(
+            brick => !brick.markedForDeletion);
     }
 
     draw(ctx){
 
-        this.gameObjects.forEach((Object) => Object.draw(ctx));
+        [...this.gameObjects, ...this.bricks].forEach((Object) => Object.draw(ctx));
 
         if (this.gamestate===GAMESTATE.PAUSED){
             // cover whole screen with color
